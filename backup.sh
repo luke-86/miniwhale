@@ -1,17 +1,16 @@
 #!/bin/bash
-# Script fuer inkrementelles Backup mit 30 taegigem Vollbackup
-set -x
-### Einstellungen ##
+
+### Settings ##
 BACKUPDIR="/mnt/backup"           ## Pfad zum Backupverzeichnis
 ROTATEDIR="/mnt/backup/rotate"    ## Pfad wo die Backups nach 30 Tagen konserviert werden
 TIMESTAMP="timestamp.dat"          ## Zeitstempel
 SOURCE="/share/CACHEDEV1_DATA/Public/ /share/snapshot"               ## Verzeichnis(se) welche(s) gesichert werden soll(en)
 DATUM="$(date +%d-%m-%Y)"          ## Datumsformat einstellen
 ZEIT="$(date +%H:%M)"              ## Zeitformat einstellen >>Edit bei NTFS und Verwendung auch unter Windows : durch . ersetzen
-MAILTO="lukas.flury@bluewin.ch"
-MAILFROM="nas.alerts@bluewin.ch"
-ANREDE="Hallo TBZ-Admin"
-SIGNATUR="Freundlicher Gruss\nLukas Flury"
+MAILTO="user@example.com"
+MAILFROM="sender@example.com"
+ANREDE="Hallo TBZ-Systemadmin"
+SIGNATUR="Freundlicher Gruss\nIhr Systemadministator"
 NFSSERVER="192.168.1.122"
 REMOTEDIR="/volume1/backup"
 
