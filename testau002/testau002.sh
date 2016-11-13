@@ -10,7 +10,7 @@ fi
 
 if [ $TASK == "create" ] ; then
   for i in {1..10}; do
-    docker run -d --name test_mariadb_$i -e MYSQL_ROOT_PASSWORD=root_$i -e MYSQL_DATABASE=db_$i -e MYSQL_USER=user_$i -e MYSQL_PASSWORD=password_$i mariadb:10
+    docker run -d --name test_mariadb_$i -p 200$i:3306 -e MYSQL_ROOT_PASSWORD=root_$i -e MYSQL_DATABASE=db -e MYSQL_USER=user_$i -e MYSQL_PASSWORD=password_$i mariadb:10
   done
 
 elif [ $TASK == "delete" ] ; then
