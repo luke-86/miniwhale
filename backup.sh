@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 ### Einstellungen ##
 BACKUPDIR="/mnt/backup"           ## Pfad zum Backupverzeichnis
 ARCHIVEDIR="/mnt/backup/archive"    ## Pfad wo die Backups nach 30 Tagen konserviert werden
@@ -16,7 +15,7 @@ SIGNATUR="Freundlicher Gruss\nIhr Systemadministator"
 NFSSERVER="192.168.1.122"
 
 ### Verzeichnisse/Dateien welche nicht gesichert werden sollen ! Achtung keinen Zeilenumbruch ! ##
-EXCLUDE="--exclude='*.sock' --exclude='*.socket'"
+EXCLUDE="--exclude='*.sock' --exclude='*.socket' --exclude='*.iso' --exclude='/share/CACHEDEV1_DATA/Public/virtualization-station-data' --exclude='/share/CACHEDEV1_DATA/Public/VM-Images'"
 
 ### Backupverzeichnis anlegen ##
 mkdir -p ${BACKUPDIR}
@@ -63,23 +62,23 @@ find $BACKUPDIR -maxdepth 1 -mtime +1 -type f -exec mv "{}" $ARCHIVEDIR \;
 find $BACKUPDIR -maxdepth 1 -mtime +3 -type f -delete
 
 ### Ausfuehren des eigentlichen Backups ##
-echo $DATUM >> $BACKUPLOG
+echo "###### Starting Backup ${DATUM} ######" >> $BACKUPLOG
 tar -cpzf ${BACKUPDIR}/${FILENAME} ${SOURCE} ${EXCLUDE} >>$BACKUPLOG 2>&1
 
 ### Abfragen ob das Backup erfolgreich war ##
 if [ $? -eq 0 ]; then
 	SUBJECT="Backup (${SOURCE}) war erfolgreich"
-	TEXT="Das Backup ${filename} am ${DATUM} wurde erfolgreich beendet."
+	TEXT="Das Backup ${FILENAME} am ${DATUM} wurde erfolgreich beendet."
 	echo -e "To: $MAILTO \nFrom: $MAILFROM \nSubject: $SUBJECT \n\n $ANREDE\n\n $TEXT \n\n $SIGNATUR" | sendmail -t
 	
 elif [ $? -eq 1 ]; then
 	SUBJECT="Backup (${SOURCE}) war erfolgreich, jedoch mit Warnungen!"
-	TEXT="Das Backup ${filename} am ${DATUM} wurde erfolgreich beendet, jedoch entstanden waehrend dem Backup Warnungen. Siehe Log (${BACKUPLOG}) für Details."
+	TEXT="Das Backup ${FILENAME} am ${DATUM} wurde erfolgreich beendet, jedoch entstanden waehrend dem Backup Warnungen. Siehe Log (${BACKUPLOG}) für Details."
 	echo -e "To: $MAILTO \nFrom: $MAILFROM \nSubject: $SUBJECT \n\n $ANREDE\n\n $TEXT \n\n $SIGNATUR" | sendmail -t
 	
 else
 	SUBJECT="Backup (${SOURCE}) war fehlerhaft!"
-	TEXT="Das Backup ${filename} am ${DATUM} konnte nicht erstellt werden! Siehe Log (${BACKUPLOG}) für Details."
+	TEXT="Das Backup ${FILENAME} am ${DATUM} konnte nicht erstellt werden! Siehe Log (${BACKUPLOG}) für Details."
 	echo -e "To: $MAILTO \nFrom: $MAILFROM \nSubject: $SUBJECT \n\n $ANREDE\n\n $TEXT \n\n $SIGNATUR" | sendmail -t
 
 fi
