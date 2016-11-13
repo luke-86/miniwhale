@@ -7,15 +7,16 @@ TIMESTAMP="timestamp.dat"          ## Zeitstempel
 SOURCE="/share/CACHEDEV1_DATA/Public/ /share/snapshot"               ## Verzeichnis(se) welche(s) gesichert werden soll(en)
 DATUM="$(date +%d-%m-%Y)"          ## Datumsformat einstellen
 ZEIT="$(date +%H:%M)"              ## Zeitformat einstellen >>Edit bei NTFS und Verwendung auch unter Windows : durch . ersetzen
-MAILTO="user@example.com"
-MAILFROM="sender@example.com"
-ANREDE="Hallo TBZ-Systemadmin"
+MAILTO="lukas.flury@bluewin.ch"
+MAILFROM="nas.alerts@bluewin.ch"
+ANREDE="Hallo TBZ-System-Administrator"
 SIGNATUR="Freundlicher Gruss\nIhr Systemadministator"
 NFSSERVER="192.168.1.122"
 REMOTEDIR="/volume1/backup"
+BACKUPLOG="/var/log/backup.log"
 
 ### Verzeichnisse/Dateien welche nicht gesichert werden sollen ! Achtung keinen Zeilenumbruch ! ##
-EXCLUDE="--exclude=/home/test1 --exclude=/home/test2"
+EXCLUDE="--exclude='*.sock' --exclude='*.socket'"
 
 ### Wechsel in root damit die Pfade stimmen ##
 cd /
@@ -29,15 +30,13 @@ if [ ! -d "${BACKUPDIR}" ]; then
         SUBJECT="Backupverzeichnis nicht vorhanden!"
         TEXT="Das Backup am ${DATUM} konnte nicht erstellt werden. Das Verzeichnis ${BACKUPDIR} wurde nicht gefunden und konnte auch nicht angelegt werden."
         echo -e "To: $MAILTO \nFrom: $MAILFROM \nSubject: $SUBJECT \n\n $ANREDE\n\n $TEXT \n\n $SIGNATUR" | sendmail -t
-
-	. exit 1
+	exit 1
 fi
 
 ### NFS Volume mounten ###
 mount -t nfs -o rw,auto,nfsvers=3,nolock $NFSSERVER:$REMOTEDIR $BACKUPDIR
 
 if ! mount | grep "/mnt/backup" > /dev/null ; then
-        echo "in the mount checker"
 	SUBJECT="NFS-Mount nicht vorhanden!"
         TEXT="Das Backup am ${DATUM} konnte nicht erstellt werden. Das Verzeichnis ${BACKUPDIR} konnte nicht gemounted werden."
         echo -e "To: $MAILTO \nFrom: $MAILFROM \nSubject: $SUBJECT \n\n $ANREDE\n\n $TEXT \n\n $SIGNATUR" | sendmail -t
@@ -63,8 +62,7 @@ if [ "$[backupnr++]" -ge 30 ]; then
         	SUBJECT="Rotateverzeichnis nicht vorhanden!"
         	TEXT="Die alten Backups konnten am ${DATUM} nicht verschoben werden. Das Verzeichnis ${ROTATEDIR} wurde nicht gefunden und konnte auch nicht angelegt werden."
         	echo -e "To: $MAILTO \nFrom: $MAILFROM \nSubject: $SUBJECT \n\n $ANREDE\n\n $TEXT \n\n $SIGNATUR" | sendmail -t
-
-		. exit 1
+		exit 1
 	else
 		### alter Code: mv ${BACKUPDIR}/* ${ROTATEDIR}/${DATUM}-${ZEIT}  Damit verschiebt er die Dateien in sich selbst weil rotate ein Unterverzeichnis von backup ist. Es kommt zur Fehlermeldung ##
 		### /b* und /t* weil die Dateien nur mit b und t beginnen ##
@@ -94,17 +92,22 @@ backupnr=${backupnr: -3}
 filename=backup-${backupnr}.tgz
 
 ### Nun wird das eigentliche Backup ausgefuehrt ##
-tar -cpzf ${BACKUPDIR}/${filename} -g ${BACKUPDIR}/${TIMESTAMP} ${SOURCE} ${EXCLUDE}
+tar -cpzf ${BACKUPDIR}/${filename} -g ${BACKUPDIR}/${TIMESTAMP} ${SOURCE} ${EXCLUDE} >>$BACKUPLOG 2>&1
 
 ### Abfragen ob das Backup erfolgreich war ##
-if [ $? -ne 0 ]; then
-	SUBJECT="Backup (${SOURCE}) war fehlerhaft!"
-	TEXT="Das Backup ${filename} am ${DATUM} konnte erstellt werden, jedoch mit Warnungen."
-	echo -e "To: $MAILTO \nFrom: $MAILFROM \nSubject: $SUBJECT \n\n $ANREDE\n\n $TEXT \n\n $SIGNATUR" | sendmail -t
-
-else
+if [ $? -eq 0 ]; then
 	SUBJECT="Backup (${SOURCE}) war erfolgreich"
 	TEXT="Das Backup ${filename} am ${DATUM} wurde erfolgreich beendet."
+	echo -e "To: $MAILTO \nFrom: $MAILFROM \nSubject: $SUBJECT \n\n $ANREDE\n\n $TEXT \n\n $SIGNATUR" | sendmail -t
+	
+elif [ $? -eq 1 ]; then
+	SUBJECT="Backup (${SOURCE}) war erfolgreich, jedoch mit Warnungen!"
+	TEXT="Das Backup ${filename} am ${DATUM} wurde erfolgreich beendet, jedoch entstanden waehrend dem Backup Warnungen. Siehe Log (${BACKUPLOG}) für Details."
+	echo -e "To: $MAILTO \nFrom: $MAILFROM \nSubject: $SUBJECT \n\n $ANREDE\n\n $TEXT \n\n $SIGNATUR" | sendmail -t
+	
+else
+	SUBJECT="Backup (${SOURCE}) war fehlerhaft!"
+	TEXT="Das Backup ${filename} am ${DATUM} konnte nicht erstellt werden! Siehe Log (${BACKUPLOG}) für Details."
 	echo -e "To: $MAILTO \nFrom: $MAILFROM \nSubject: $SUBJECT \n\n $ANREDE\n\n $TEXT \n\n $SIGNATUR" | sendmail -t
 
 fi
