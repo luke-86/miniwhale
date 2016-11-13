@@ -34,7 +34,10 @@ if [ ! -d "${BACKUPDIR}" ]; then
 fi
 
 ### NFS Volume mounten ###
-mount -t nfs -o rw,auto,nfsvers=3,nolock $NFSSERVER:$REMOTEDIR $BACKUPDIR
+if ! mount | grep "/mnt/backup" > /dev/null ; then
+	mount -t nfs -o rw,auto,nfsvers=3,nolock $NFSSERVER:$REMOTEDIR $BACKUPDIR
+	sleep 10
+fi
 
 if ! mount | grep "/mnt/backup" > /dev/null ; then
 	SUBJECT="NFS-Mount nicht vorhanden!"
