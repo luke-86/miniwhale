@@ -3,23 +3,18 @@
 ### Settings ##
 BACKUPDIR="/mnt/backup"           ## Pfad zum Backupverzeichnis
 ARCHIVEDIR="/mnt/backup/archive"    ## Pfad wo die Backups nach 30 Tagen konserviert werden
-TIMESTAMP="timestamp.dat"          ## Zeitstempel
+REMOTEDIR="/volume1/backup"
+BACKUPLOG="/var/log/backup.log"
 SOURCE="/share/CACHEDEV1_DATA/Public/ /share/snapshot"               ## Verzeichnis(se) welche(s) gesichert werden soll(en)
-DATUM="$(date +%d-%m-%Y)"          ## Datumsformat einstellen
-ZEIT="$(date +%H:%M)"              ## Zeitformat einstellen >>Edit bei NTFS und Verwendung auch unter Windows : durch . ersetzen
+DATUM="$(date +%F)"          ## Datumsformat einstellen
 MAILTO="lukas.flury@bluewin.ch"
 MAILFROM="nas.alerts@bluewin.ch"
 ANREDE="Hallo TBZ-System-Administrator"
 SIGNATUR="Freundlicher Gruss\nIhr Systemadministator"
 NFSSERVER="192.168.1.122"
-REMOTEDIR="/volume1/backup"
-BACKUPLOG="/var/log/backup.log"
 
 ### Verzeichnisse/Dateien welche nicht gesichert werden sollen ! Achtung keinen Zeilenumbruch ! ##
 EXCLUDE="--exclude='*.sock' --exclude='*.socket'"
-
-### Wechsel in root damit die Pfade stimmen ##
-cd /
 
 ### Backupverzeichnis anlegen ##
 mkdir -p ${BACKUPDIR}
