@@ -1,12 +1,14 @@
 #!/bin/bash
 
-### Settings ##
+
+### Einstellungen ##
 BACKUPDIR="/mnt/backup"           ## Pfad zum Backupverzeichnis
 ARCHIVEDIR="/mnt/backup/archive"    ## Pfad wo die Backups nach 30 Tagen konserviert werden
+FILENAME="backup-$(date +'%F_%H-%M').tgz"
 REMOTEDIR="/volume1/backup"
 BACKUPLOG="/var/log/backup.log"
 SOURCE="/share/CACHEDEV1_DATA/Public/ /share/snapshot"               ## Verzeichnis(se) welche(s) gesichert werden soll(en)
-DATUM="$(date +%F)"          ## Datumsformat einstellen
+DATUM="$(date +'%F %T')"          ## Datumsformat einstellen
 MAILTO="lukas.flury@bluewin.ch"
 MAILFROM="nas.alerts@bluewin.ch"
 ANREDE="Hallo TBZ-System-Administrator"
@@ -36,7 +38,7 @@ fi
 
 if ! mount | grep "/mnt/backup" > /dev/null ; then
 	SUBJECT="NFS-Mount nicht vorhanden!"
-        TEXT="Das Backup am ${DATUM} konnte nicht erstellt werden. Das Verzeichnis ${BACKUPDIR} konnte nicht gemounted werden."
+        TEXT="Das Backup am ${DATUM} konnte nicht erstellt werden. Das Backup-Verzeichnis ${BACKUPDIR} konnte nicht gemounted werden."
         echo -e "To: $MAILTO \nFrom: $MAILFROM \nSubject: $SUBJECT \n\n $ANREDE\n\n $TEXT \n\n $SIGNATUR" | sendmail -t
         exit 1
 fi
@@ -49,20 +51,20 @@ mkdir -p ${ARCHIVEDIR}
 if [ ! -d "${ARCHIVEDIR}" ]; then
 
         SUBJECT="Archivierungs-Verzeichnis nicht vorhanden!"
-        TEXT="Das Backup am ${DATUM} konnte nicht erstellt werden. Das Verzeichnis ${ARCHIVEDIR} wurde nicht gefunden und konnte auch nicht angelegt werden."
+        TEXT="Das Backup am ${DATUM} konnte nicht erstellt werden. Das Archiv-Verzeichnis ${ARCHIVEDIR} wurde nicht gefunden und konnte auch nicht angelegt werden."
         echo -e "To: $MAILTO \nFrom: $MAILFROM \nSubject: $SUBJECT \n\n $ANREDE\n\n $TEXT \n\n $SIGNATUR" | sendmail -t
 	exit 1
 fi
 
 ### Backup-Archivierung für Datein die Aelter sind als 30 Tage ##
-find $BACKUPDIR -maxdepth 1 -mtime +30 -type f -exec mv "{}" $ARCHIVEDIR \;
+find $BACKUPDIR -maxdepth 1 -mtime +1 -type f -exec mv "{}" $ARCHIVEDIR \;
 
 ### Archivierungs-Cleanup für Datein die Aelter sind als 60 Tage ##
-find $BACKUPDIR -maxdepth 1 -mtime +60 -type f -delete
+find $BACKUPDIR -maxdepth 1 -mtime +3 -type f -delete
 
 ### Ausfuehren des eigentlichen Backups ##
 echo $DATUM >> $BACKUPLOG
-tar -cpzf ${BACKUPDIR}/${filename} -g ${BACKUPDIR}/${TIMESTAMP} ${SOURCE} ${EXCLUDE} >>$BACKUPLOG 2>&1
+tar -cpzf ${BACKUPDIR}/${FILENAME} ${SOURCE} ${EXCLUDE} >>$BACKUPLOG 2>&1
 
 ### Abfragen ob das Backup erfolgreich war ##
 if [ $? -eq 0 ]; then
