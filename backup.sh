@@ -68,17 +68,17 @@ echo "###### Backup ${FILENAME} finished ######" >> $BACKUPLOG
 
 ### Abfragen ob das Backup erfolgreich war ##
 if [ $? -eq 0 ]; then
-	SUBJECT="Backup (${SOURCE}) war erfolgreich"
+	SUBJECT="Backup (${FILENAME}) war erfolgreich"
 	TEXT="Das Backup ${FILENAME} am ${DATUM} wurde erfolgreich beendet."
 	echo -e "To: $MAILTO \nFrom: $MAILFROM \nSubject: $SUBJECT \n\n $ANREDE\n\n $TEXT \n\n $SIGNATUR" | sendmail -t
 	
 elif [ $? -eq 1 ]; then
-	SUBJECT="Backup (${SOURCE}) war erfolgreich, jedoch mit Warnungen!"
+	SUBJECT="Backup (${FILENAME}) war erfolgreich, jedoch mit Warnungen!"
 	TEXT="Das Backup ${FILENAME} am ${DATUM} wurde erfolgreich beendet, jedoch entstanden waehrend dem Backup Warnungen. Siehe Log (${BACKUPLOG}) für Details."
 	echo -e "To: $MAILTO \nFrom: $MAILFROM \nSubject: $SUBJECT \n\n $ANREDE\n\n $TEXT \n\n $SIGNATUR" | sendmail -t
 	
 else
-	SUBJECT="Backup (${SOURCE}) war fehlerhaft!"
+	SUBJECT="Backup (${FILENAME}) war fehlerhaft!"
 	TEXT="Das Backup ${FILENAME} am ${DATUM} konnte nicht erstellt werden! Siehe Log (${BACKUPLOG}) für Details."
 	echo -e "To: $MAILTO \nFrom: $MAILFROM \nSubject: $SUBJECT \n\n $ANREDE\n\n $TEXT \n\n $SIGNATUR" | sendmail -t
 
