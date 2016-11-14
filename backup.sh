@@ -3,7 +3,7 @@
 ### Einstellungen ##
 BACKUPDIR="/mnt/backup"           ## Pfad zum Backupverzeichnis
 ARCHIVEDIR="/mnt/backup/archive"    ## Pfad wo die Backups nach 30 Tagen konserviert werden
-FILENAME="backup-$(date +'%F_%H-%M').tgz"
+FILENAME="backup-$(date +'%F_%H-%M').tar"
 REMOTEDIR="/volume1/backup"
 BACKUPLOG="/var/log/backup.log"
 SOURCE="/share/CACHEDEV1_DATA/Public/ /share/snapshot"               ## Verzeichnis(se) welche(s) gesichert werden soll(en)
@@ -15,7 +15,7 @@ SIGNATUR="Freundlicher Gruss\nIhr Systemadministator"
 NFSSERVER="192.168.1.122"
 
 ### Verzeichnisse/Dateien welche nicht gesichert werden sollen ! Achtung keinen Zeilenumbruch ! ##
-EXCLUDE="--exclude='*.sock' --exclude='*.socket' --exclude='*.iso' --exclude='/share/CACHEDEV1_DATA/Public/virtualization-station-data' --exclude='/share/CACHEDEV1_DATA/Public/VM-Images'"
+EXCLUDE="--exclude=*.sock --exclude=*.socket --exclude=*.iso --exclude=*.img --exclude=*.qvm --exclude=/share/CACHEDEV1_DATA/Public/virtualization-station-data --exclude=/share/CACHEDEV1_DATA/Public/VM-Images --exclude=/share/CACHEDEV1_DATA/Public/container-station-data/lib/docker/devicemapper/devicemapper/data --exclude=*/devicemapper/data"
 
 ### Backupverzeichnis anlegen ##
 mkdir -p ${BACKUPDIR}
@@ -55,15 +55,16 @@ if [ ! -d "${ARCHIVEDIR}" ]; then
 	exit 1
 fi
 
-### Backup-Archivierung für Datein die Aelter sind als 30 Tage ##
+### Backup-Archivierung für Datein die Aelter sind als14 Tage ##
 find $BACKUPDIR -maxdepth 1 -mtime +1 -type f -exec mv "{}" $ARCHIVEDIR \;
 
-### Archivierungs-Cleanup für Datein die Aelter sind als 60 Tage ##
-find $BACKUPDIR -maxdepth 1 -mtime +3 -type f -delete
+### Archivierungs-Cleanup für Datein die Aelter sind als14 Tage ##
+find $ARCHIVEDIR -maxdepth 1 -mtime +3 -type f -delete
 
 ### Ausfuehren des eigentlichen Backups ##
-echo "###### Starting Backup ${DATUM} ######" >> $BACKUPLOG
-tar -cpzf ${BACKUPDIR}/${FILENAME} ${SOURCE} ${EXCLUDE} >>$BACKUPLOG 2>&1
+echo "###### Starting Backup ${FILENAME} ######" >> $BACKUPLOG
+tar -cpvf ${BACKUPDIR}/${FILENAME} ${EXCLUDE} ${SOURCE} >>$BACKUPLOG 2>&1
+echo "###### Backup ${FILENAME} finished ######" >> $BACKUPLOG
 
 ### Abfragen ob das Backup erfolgreich war ##
 if [ $? -eq 0 ]; then
