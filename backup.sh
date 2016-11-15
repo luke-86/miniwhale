@@ -1,18 +1,20 @@
 #!/bin/bash
 
 ### Einstellungen ##
-BACKUPDIR="/mnt/backup"           ## Pfad zum Backupverzeichnis
-ARCHIVEDIR="/mnt/backup/archive"    ## Pfad wo die Backups nach 30 Tagen konserviert werden
-FILENAME="backup-$(date +'%F_%H-%M').tar"
-REMOTEDIR="/volume1/backup"
-BACKUPLOG="/var/log/backup.log"
-SOURCE="/share/CACHEDEV1_DATA/Public/ /share/snapshot"               ## Verzeichnis(se) welche(s) gesichert werden soll(en)
-DATUM="$(date +'%F %T')"          ## Datumsformat einstellen
 MAILTO="lukas.flury@bluewin.ch"
 MAILFROM="nas.alerts@bluewin.ch"
 ANREDE="Hallo TBZ-System-Administrator"
 SIGNATUR="Freundlicher Gruss\nIhr Systemadministator"
 NFSSERVER="192.168.1.122"
+
+### Variablen ##
+BACKUPDIR="/mnt/backup"
+ARCHIVEDIR="/mnt/backup/archive"
+FILENAME="backup-$(date +'%F_%H-%M').tar"
+REMOTEDIR="/volume1/backup"
+BACKUPLOG="/share/CACHEDEV1_DATA/backup/backup.log"
+SOURCE="/share/CACHEDEV1_DATA/Public/ /share/snapshot /etc"
+DATUM="$(date +'%F %T')"
 
 ### Verzeichnisse/Dateien welche nicht gesichert werden sollen ! Achtung keinen Zeilenumbruch ! ##
 EXCLUDE="--exclude=*.sock --exclude=*.socket --exclude=*.iso --exclude=*.img --exclude=*.qvm --exclude=/share/CACHEDEV1_DATA/Public/virtualization-station-data --exclude=/share/CACHEDEV1_DATA/Public/VM-Images --exclude=/share/CACHEDEV1_DATA/Public/container-station-data/lib/docker/devicemapper/devicemapper/data --exclude=*/devicemapper/data"
