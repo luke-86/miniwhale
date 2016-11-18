@@ -5,7 +5,7 @@ MAILTO="lukas.flury@bluewin.ch"
 MAILFROM="nas.alerts@bluewin.ch"
 ANREDE="Hallo TBZ-System-Administrator"
 SIGNATUR="Freundlicher Gruss\nIhr Systemadministator"
-NFSSERVER="192.168.1.122"
+NFSSERVER="172.16.16.104"
 
 ### Variablen ##
 BACKUPDIR="/mnt/backup"
