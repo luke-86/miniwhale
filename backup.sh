@@ -4,7 +4,7 @@
 MAILTO="lukas.flury@bluewin.ch"
 MAILFROM="nas.alerts@bluewin.ch"
 ANREDE="Hallo TBZ-System-Administrator"
-SIGNATUR="Freundlicher Gruss\nIhr Systemadministator"
+SIGNATUR="Freundlicher Gruss\nLukas Flury"
 NFSSERVER="172.16.16.104"
 
 ### Variablen ##
@@ -16,13 +16,13 @@ BACKUPLOG="/share/CACHEDEV1_DATA/backup/backup.log"
 SOURCE="/share/CACHEDEV1_DATA/Public/ /share/snapshot /etc"
 DATUM="$(date +'%F %T')"
 
-### Verzeichnisse/Dateien welche nicht gesichert werden sollen ! Achtung keinen Zeilenumbruch ! ##
+### Verzeichnisse/Dateien welche nicht gesichert werden (excludes) ###
 EXCLUDE="--exclude=*.sock --exclude=*.socket --exclude=*.iso --exclude=*.img --exclude=*.qvm --exclude=/share/CACHEDEV1_DATA/Public/virtualization-station-data --exclude=/share/CACHEDEV1_DATA/Public/VM-Images --exclude=/share/CACHEDEV1_DATA/Public/container-station-data/lib/docker/devicemapper/devicemapper/data --exclude=*/devicemapper/data"
 
-### Backupverzeichnis anlegen ##
+### Backupverzeichnis anlegen ###
 mkdir -p ${BACKUPDIR}
 
-### Test ob Backupverzeichnis existiert und Mail an Admin bei fehlschlagen ##
+### Test ob Backupverzeichnis existiert und Mail an Admin bei fehlschlagen ###
 if [ ! -d "${BACKUPDIR}" ]; then
 
         SUBJECT="Backupverzeichnis nicht vorhanden!"
@@ -45,10 +45,10 @@ if ! mount | grep "/mnt/backup" > /dev/null ; then
 fi
 
 
-### Alle Variablen einlesen und letzte Backupdateinummer herausfinden ##
+### Erstellen des Archiv-Verzeichnis ###
 mkdir -p ${ARCHIVEDIR}
 
-### Test ob Backupverzeichnis existiert und Mail an Admin bei fehlschlagen ##
+### Test ob Archiv-Verzeichnis existiert und Mail an Admin bei fehlschlagen ###
 if [ ! -d "${ARCHIVEDIR}" ]; then
 
         SUBJECT="Archivierungs-Verzeichnis nicht vorhanden!"
@@ -57,13 +57,13 @@ if [ ! -d "${ARCHIVEDIR}" ]; then
 	exit 1
 fi
 
-### Backup-Archivierung für Datein die Aelter sind als14 Tage ##
-find $BACKUPDIR -maxdepth 1 -mtime +1 -type f -exec mv "{}" $ARCHIVEDIR \;
+### Backup-Archivierung für Datein die Aelter sind al 14 Tage ###
+find $BACKUPDIR -maxdepth 1 -mtime +14 -type f -exec mv "{}" $ARCHIVEDIR \;
 
-### Archivierungs-Cleanup für Datein die Aelter sind als14 Tage ##
-find $ARCHIVEDIR -maxdepth 1 -mtime +3 -type f -delete
+### Archivierungs-Cleanup für Datein die Aelter sind al 30 Tage ###
+find $ARCHIVEDIR -maxdepth 1 -mtime +30 -type f -delete
 
-### Ausfuehren des eigentlichen Backups ##
+### Ausfuehren des eigentlichen Backups ###
 echo "###### Starting Backup ${FILENAME} ######" >> $BACKUPLOG
 tar -cpf ${BACKUPDIR}/${FILENAME} ${EXCLUDE} ${SOURCE} >>$BACKUPLOG 2>&1
 echo "###### Backup ${FILENAME} finished ######" >> $BACKUPLOG
