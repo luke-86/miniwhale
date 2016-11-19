@@ -57,18 +57,18 @@ if [ ! -d "${ARCHIVEDIR}" ]; then
 	exit 1
 fi
 
-### Backup-Archivierung für Datein die Aelter sind al 14 Tage ###
+### Backup-Archivierung für Datein die Aelter sind als 14 Tage ###
 find $BACKUPDIR -maxdepth 1 -mtime +14 -type f -exec mv "{}" $ARCHIVEDIR \;
 
-### Archivierungs-Cleanup für Datein die Aelter sind al 30 Tage ###
+### Archivierungs-Cleanup für Datein die Aelter sind als 30 Tage ###
 find $ARCHIVEDIR -maxdepth 1 -mtime +30 -type f -delete
 
 ### Ausfuehren des eigentlichen Backups ###
 echo "###### Starting Backup ${FILENAME} ######" >> $BACKUPLOG
 tar -cpf ${BACKUPDIR}/${FILENAME} ${EXCLUDE} ${SOURCE} >>$BACKUPLOG 2>&1
-echo "###### Backup ${FILENAME} finished ######" >> $BACKUPLOG
+echo "###### Backup ${FILENAME} finished at $(date +'%F %H:%M') ######" >> $BACKUPLOG
 
-### Abfragen ob das Backup erfolgreich war ##
+### Abfragen ob das Backup erfolgreich war und Versand des Mails ###
 if [ $? -eq 0 ]; then
 	SUBJECT="Backup (${FILENAME}) war erfolgreich"
 	TEXT="Das Backup ${FILENAME} am ${DATUM} wurde erfolgreich beendet."
