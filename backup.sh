@@ -65,7 +65,7 @@ find $ARCHIVEDIR -maxdepth 1 -mtime +3 -type f -delete
 
 ### Ausfuehren des eigentlichen Backups ##
 echo "###### Starting Backup ${FILENAME} ######" >> $BACKUPLOG
-tar -cpvf ${BACKUPDIR}/${FILENAME} ${EXCLUDE} ${SOURCE} >>$BACKUPLOG 2>&1
+tar -cpf ${BACKUPDIR}/${FILENAME} ${EXCLUDE} ${SOURCE} >>$BACKUPLOG 2>&1
 echo "###### Backup ${FILENAME} finished ######" >> $BACKUPLOG
 
 ### Abfragen ob das Backup erfolgreich war ##
