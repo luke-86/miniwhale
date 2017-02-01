@@ -1,10 +1,10 @@
 #!/bin/bash
 
 ### Einstellungen ##
-MAILTO="lukas.flury@bluewin.ch"
+MAILTO="beat.hartmann@tbz.ch"
 MAILFROM="nas.alerts@bluewin.ch"
-ANREDE="Hallo TBZ-System-Administrator"
-SIGNATUR="Freundlicher Gruss\nLukas Flury"
+ANREDE="Sehr geehrter Herr Hartmann"
+SIGNATUR="Freundlicher Gruss\nProjekt MiniWhale"
 BACKUPDISK="/dev/sdd1"
 
 ### Variablen ##
@@ -70,9 +70,9 @@ echo "###### Backup ${FILENAME} finished at $(date +'%F %H:%M') ######" >> $BACK
 
 ### Abfragen ob das Backup erfolgreich war und Versand des Mails ###
 if [ $? -eq 0 ]; then
-	SUBJECT="Backup (${FILENAME}) war erfolgreich"
-	TEXT="Das Backup ${FILENAME} am ${DATUM} wurde erfolgreich beendet."
-	echo -e "To: $MAILTO \nFrom: $MAILFROM \nSubject: $SUBJECT \n\n $ANREDE\n\n $TEXT \n\n $SIGNATUR" | sendmail -t
+	#SUBJECT="Backup (${FILENAME}) war erfolgreich"
+	#TEXT="Das Backup ${FILENAME} am ${DATUM} wurde erfolgreich beendet."
+	#echo -e "To: $MAILTO \nFrom: $MAILFROM \nSubject: $SUBJECT \n\n $ANREDE\n\n $TEXT \n\n $SIGNATUR" | sendmail -t
 	
 elif [ $? -eq 1 ]; then
 	SUBJECT="Backup (${FILENAME}) war erfolgreich, jedoch mit Warnungen!"
