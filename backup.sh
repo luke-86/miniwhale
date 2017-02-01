@@ -70,8 +70,8 @@ echo "###### Backup ${FILENAME} finished at $(date +'%F %H:%M') ######" >> $BACK
 
 ### Abfragen ob das Backup erfolgreich war und Versand des Mails ###
 if [ $? -eq 0 ]; then
-	#SUBJECT="Backup (${FILENAME}) war erfolgreich"
-	#TEXT="Das Backup ${FILENAME} am ${DATUM} wurde erfolgreich beendet."
+	SUBJECT="Backup (${FILENAME}) war erfolgreich"
+	TEXT="Das Backup ${FILENAME} am ${DATUM} wurde erfolgreich beendet."
 	#echo -e "To: $MAILTO \nFrom: $MAILFROM \nSubject: $SUBJECT \n\n $ANREDE\n\n $TEXT \n\n $SIGNATUR" | sendmail -t
 	
 elif [ $? -eq 1 ]; then
