@@ -5,7 +5,7 @@ MAILTO="lukas.flury@bluewin.ch"
 MAILFROM="nas.alerts@bluewin.ch"
 ANREDE="Hallo TBZ-System-Administrator"
 SIGNATUR="Freundlicher Gruss\nLukas Flury"
-NFSSERVER="172.16.16.104"
+BACKUPDISK="/dev/sdd1"
 
 ### Variablen ##
 BACKUPDIR="/mnt/backup"
@@ -31,14 +31,14 @@ if [ ! -d "${BACKUPDIR}" ]; then
 	exit 1
 fi
 
-### NFS Volume mounten ###
+### Backup Volume mounten ###
 if ! mount | grep "/mnt/backup" > /dev/null ; then
-	mount -t nfs -o rw,auto,nfsvers=3,nolock $NFSSERVER:$REMOTEDIR $BACKUPDIR
+	mount -o rw,auto $BACKUPDISK $BACKUPDIR
 	sleep 10
 fi
 
 if ! mount | grep "/mnt/backup" > /dev/null ; then
-	SUBJECT="NFS-Mount nicht vorhanden!"
+	SUBJECT="Backup-Disk nicht vorhanden!"
         TEXT="Das Backup am ${DATUM} konnte nicht erstellt werden. Das Backup-Verzeichnis ${BACKUPDIR} konnte nicht gemounted werden."
         echo -e "To: $MAILTO \nFrom: $MAILFROM \nSubject: $SUBJECT \n\n $ANREDE\n\n $TEXT \n\n $SIGNATUR" | sendmail -t
         exit 1
